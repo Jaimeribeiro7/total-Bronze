@@ -1,561 +1,130 @@
 <html lang="pt-BR">
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Total Bronze</title>
-    <!-- Link para o arquivo CSS -->
-    <link rel="stylesheet" href="styles.css">
-</head>
-</body>
-</html>
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Total Bronze - Sistema de Agendamento</title>
-  <link rel="stylesheet" href="styles.css">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <title>Total Bronze - Sistema de Gestão</title>
+  
+  <!-- FullCalendar -->
+  <link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/main.min.css' rel='stylesheet'>
+  <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js'></script>
+  
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  
+  <!-- SheetJS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <nav class="navbar navbar-expand-lg navbar-dark bg-orange">
-    <div class="container">
-      <a class="navbar-brand" href="#"><i class="fas fa-sun"></i> Total Bronze</a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav">
-          <li class="nav-item">
-            <a class="nav-link" href="#" onclick="showSection('agendamentos')">Agendamentos</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#" onclick="showSection('clientes')">Clientes</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#" onclick="showSection('financeiro')">Financeiro</a>
-          </li>
-        </ul>
+  <div id="main-screen" class="screen">
+    <nav>
+      <div class="nav-header">
+        <h1>Total Bronze</h1>
       </div>
-    </div>
-  </nav>
+      <ul>
+        <li><a href="#agenda" class="nav-link active"><i class="fas fa-calendar-alt"></i> Agenda</a></li>
+        <li><a href="#clientes" class="nav-link"><i class="fas fa-users"></i> Clientes</a></li>
+        <li><a href="#servicos" class="nav-link"><i class="fas fa-spa"></i> Serviços</a></li>
+        <li><a href="#produtos" class="nav-link"><i class="fas fa-box"></i> Produtos</a></li>
+        <li><a href="#financeiro" class="nav-link"><i class="fas fa-chart-line"></i> Financeiro</a></li>
+        <li><a href="#relatorios" class="nav-link"><i class="fas fa-file-alt"></i> Relatórios</a></li>
+        <li><a href="#configuracoes" class="nav-link"><i class="fas fa-cog"></i> Configurações</a></li>
+      </ul>
+    </nav>
 
-  <div class="container mt-4">
-    <!-- Seção de Agendamentos -->
-    <div id="agendamentos" class="section">
-      <div class="row">
-        <div class="col-12">
-          <div class="card">
-            <div class="card-body">
-              <div class="calendario-container">
-                <div class="calendario-header">
-                  <h5 class="card-title">AGENDA</h5>
-                  <div class="date-selection-container">
-                    <div class="date-selection-buttons">
-                      <button id="btnHoje" class="btn btn-orange">Hoje</button>
-                      <button id="btnAmanha" class="btn btn-orange">Amanhã</button>
-                      <button id="btnOutraData" class="btn btn-orange">Outra Data</button>
-                    </div>
-                    <div class="date-picker-container">
-                      <input type="date" id="dataVisualizacao" class="form-control">
-                    </div>
-                  </div>
-                </div>
-                <div id="calendario">
-                  <!-- Preenchido via JavaScript -->
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Modal de Agendamento -->
-    <div class="modal fade" id="agendamentoModal" tabindex="-1">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">Novo Agendamento</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-          </div>
-          <div class="modal-body">
-            <form id="formAgendamento">
-              <input type="hidden" name="horario">
-              <input type="hidden" name="data">
-              
-              <div class="mb-3">
-                <label class="form-label">Cliente</label>
-                <select class="form-select" id="clienteSelect" required>
-                  <!-- Preenchido via JavaScript -->
-                </select>
-              </div>
-              
-              <div class="mb-3">
-                <label class="form-label">Serviço</label>
-                <select class="form-select" id="servicoSelect" required>
-                  <option value="">Selecione o serviço</option>
-                  <option value="natural" data-preco="80">Bronzeamento Natural - R$ 80,00</option>
-                  <option value="artificial" data-preco="120">Bronzeamento Artificial - R$ 120,00</option>
-                </select>
-              </div>
-
-              <div class="horario-selecionado mb-3">
-                <label class="form-label">Horário Selecionado:</label>
-                <span id="horarioSelecionado"></span>
-              </div>
-
-              <button type="submit" class="btn btn-orange w-100">Confirmar Agendamento</button>
-            </form>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Seção de Clientes -->
-    <div id="clientes" class="section" style="display: none;">
-      <div class="client-header">
-        <h2>Clientes</h2>
-        <button class="new-client-btn" onclick="showClientRegistrationForm()">
-          <i class="fas fa-plus"></i> Novo Cliente
-        </button>
-      </div>
-      
-      <div class="row mt-4">
-        <div class="col-12">
-          <div class="card">
-            <div class="card-body">
-              <div class="table-responsive">
-                <table class="table">
-                  <thead>
-                    <tr>
-                      <th>Nome</th>
-                      <th>Telefone</th>
-                      <th>Ações</th>
-                    </tr>
-                  </thead>
-                  <tbody id="tabelaClientes">
-                    <!-- Preenchido via JavaScript -->
-                  </tbody>
-                </table>
-              </div>
-            </div>
+    <main>
+      <div id="agenda" class="page">
+        <header>
+          <h1>Agenda</h1>
+          <button id="novo-agendamento" class="primary-btn">
+            <i class="fas fa-plus"></i> Novo Agendamento
+          </button>
+        </header>
+        <div class="calendar-container">
+          <div id="calendar"></div>
+          <div id="agenda-list">
+            <!-- Lista de agendamentos será preenchida dinamicamente -->
           </div>
         </div>
       </div>
 
-      <!-- Modal de Cadastro de Cliente -->
-      <div class="modal fade" id="clienteRegistrationModal" tabindex="-1">
-        <div class="modal-dialog modal-dialog-scrollable modal-lg">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title">Cadastro de Cliente</h5>
-              <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-              <form id="formCliente" class="anamnese-form">
-                <!-- Dados Pessoais -->
-                <h6 class="mb-3">Dados Pessoais</h6>
-                <div class="row mb-3">
-                  <div class="col-md-12">
-                    <label class="form-label">Nome Completo</label>
-                    <input type="text" name="nome" class="form-control" required>
-                  </div>
-                </div>
-                <div class="row mb-3">
-                  <div class="col-md-6">
-                    <label class="form-label">CPF</label>
-                    <input type="text" class="form-control cpf-mask" required>
-                  </div>
-                  <div class="col-md-6">
-                    <label class="form-label">Telefone</label>
-                    <input type="tel" class="form-control phone-mask" required>
-                  </div>
-                </div>
-                
-                <!-- Verificação de Idade -->
-                <div class="mb-3">
-                  <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="maiorIdade">
-                    <label class="form-check-label" for="maiorIdade">
-                      Maior de 18 anos
-                    </label>
-                  </div>
-                </div>
-
-                <!-- Termo de Responsabilidade (aparece se menor de idade) -->
-                <div id="termoResponsabilidade" class="termo-responsabilidade" style="display: none;">
-                  <h6>Termo de Responsabilidade</h6>
-                  <p>Eu, responsável legal pelo menor, autorizo a realização do procedimento de bronzeamento
-                     e declaro estar ciente dos riscos e recomendações associados ao tratamento.</p>
-                  <div class="signature-pad">
-                    <label>Assinatura do Responsável:</label>
-                    <input type="text" id="responsibleSignature" class="form-control">
-                  </div>
-                </div>
-
-                <!-- Ficha de Anamnese -->
-                <h6 class="mb-3 mt-4">Ficha de Anamnese</h6>
-                
-                <div class="mb-3">
-                  <label class="form-label">Fototipo</label>
-                  <select id="fototipo" class="form-select" required>
-                    <option value="">Selecione</option>
-                    <option value="I">Tipo I - Muito clara, sempre queima</option>
-                    <option value="II">Tipo II - Clara, queima com facilidade</option>
-                    <option value="III">Tipo III - Média, às vezes queima</option>
-                    <option value="IV">Tipo IV - Morena clara, raramente queima</option>
-                    <option value="V">Tipo V - Morena escura, muito raramente queima</option>
-                    <option value="VI">Tipo VI - Negra, nunca queima</option>
-                  </select>
-                </div>
-
-                <div class="mb-3">
-                  <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="alergiasCheck">
-                    <label class="form-check-label" for="alergiasCheck">
-                      Possui alergias?
-                    </label>
-                  </div>
-                  <textarea id="alergias" class="form-control mt-2" rows="2" placeholder="Se sim, especifique quais" style="display: none;"></textarea>
-                </div>
-
-                <div class="mb-3">
-                  <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="medicamentosCheck">
-                    <label class="form-check-label" for="medicamentosCheck">
-                      Faz uso de medicamentos?
-                    </label>
-                  </div>
-                  <textarea id="medicamentos" class="form-control mt-2" rows="2" placeholder="Se sim, especifique quais" style="display: none;"></textarea>
-                </div>
-
-                <div class="mb-3">
-                  <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="gestante">
-                    <label class="form-check-label" for="gestante">
-                      Gestante ou Amamentando?
-                    </label>
-                  </div>
-                  <textarea id="gestanteDetalhes" class="form-control mt-2" rows="2" placeholder="Se sim, forneça detalhes" style="display: none;"></textarea>
-                </div>
-
-                <div class="mb-3">
-                  <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="doencasPeleCheck">
-                    <label class="form-check-label" for="doencasPeleCheck">
-                      Possui doenças de pele?
-                    </label>
-                  </div>
-                  <textarea id="doencasPele" class="form-control mt-2" rows="2" placeholder="Se sim, especifique quais" style="display: none;"></textarea>
-                </div>
-
-                <div class="mb-3">
-                  <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="cirurgiaRecenteCheck">
-                    <label class="form-check-label" for="cirurgiaRecenteCheck">
-                      Realizou cirurgias recentemente?
-                    </label>
-                  </div>
-                  <textarea id="cirurgiaRecente" class="form-control mt-2" rows="2" placeholder="Se sim, especifique quais e quando" style="display: none;"></textarea>
-                </div>
-
-                <div class="mb-3">
-                  <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="problemasCardiacosCheck">
-                    <label class="form-check-label" for="problemasCardiacosCheck">
-                      Possui problemas cardíacos?
-                    </label>
-                  </div>
-                  <textarea id="problemasCardiacos" class="form-control mt-2" rows="2" placeholder="Se sim, especifique quais" style="display: none;"></textarea>
-                </div>
-
-                <div class="mb-3">
-                  <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="hipertensaoCheck">
-                    <label class="form-check-label" for="hipertensaoCheck">
-                      Possui hipertensão?
-                    </label>
-                  </div>
-                  <textarea id="hipertensaoDetalhes" class="form-control mt-2" rows="2" placeholder="Se sim, forneça detalhes" style="display: none;"></textarea>
-                </div>
-
-                <div class="mb-3">
-                  <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="diabetesCheck">
-                    <label class="form-check-label" for="diabetesCheck">
-                      Possui diabetes?
-                    </label>
-                  </div>
-                  <textarea id="diabetesDetalhes" class="form-control mt-2" rows="2" placeholder="Se sim, forneça detalhes" style="display: none;"></textarea>
-                </div>
-
-                <div class="mb-3">
-                  <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="cancerCheck">
-                    <label class="form-check-label" for="cancerCheck">
-                      Possui histórico de câncer?
-                    </label>
-                  </div>
-                  <textarea id="cancer" class="form-control mt-2" rows="2" placeholder="Se sim, especifique detalhes" style="display: none;"></textarea>
-                </div>
-
-                <div class="mb-3">
-                  <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="tratamentoDermatologicoCheck">
-                    <label class="form-check-label" for="tratamentoDermatologicoCheck">
-                      Está em tratamento dermatológico?
-                    </label>
-                  </div>
-                  <textarea id="tratamentoDermatologico" class="form-control mt-2" rows="2" placeholder="Se sim, especifique qual tratamento" style="display: none;"></textarea>
-                </div>
-
-                <div class="mb-4 mt-4">
-                  <div class="termo-consentimento">
-                    <h6>Termo de Responsabilidade e Consentimento</h6>
-                    <div class="termo-text p-3 bg-light rounded">
-                      <p>Eu, <span class="term-name"></span>, declaro que:</p>
-                      <ol>
-                        <li>Fui devidamente informado(a) sobre o procedimento de bronzeamento, seus benefícios, riscos e possíveis efeitos colaterais.</li>
-                        <li>Compreendo que o resultado do bronzeamento pode variar de pessoa para pessoa e que não há garantia de resultados específicos.</li>
-                        <li>Estou ciente que devo seguir todas as orientações fornecidas antes, durante e após o procedimento.</li>
-                        <li>Entendo que o não cumprimento das orientações pode resultar em queimaduras, manchas ou outros efeitos indesejados.</li>
-                        <li>Isento a Total Bronze e seus profissionais de qualquer responsabilidade por resultados insatisfatórios ou efeitos adversos decorrentes:</li>
-                        <ul>
-                          <li>Do não cumprimento das orientações fornecidas</li>
-                          <li>De condições próprias de minha pele ou saúde não informadas</li>
-                          <li>De reações alérgicas ou sensibilidades não previamente conhecidas</li>
-                        </ul>
-                        <li>Autorizo a realização do procedimento e confirmo que todas as informações fornecidas na ficha de anamnese são verdadeiras.</li>
-                      </ol>
-                      <div class="mt-3">
-                        <div class="form-check">
-                          <input class="form-check-input" type="checkbox" id="aceitaTermos" required>
-                          <label class="form-check-label" for="aceitaTermos">
-                            Li e aceito os termos de responsabilidade e consentimento
-                          </label>
-                        </div>
-                      </div>
-                      <button type="submit" class="btn btn-cadastrar">Cadastrar Cliente</button>
-                    </div>
-                  </div>
-                </div>
-              </form>
-            </div>
-          </div>
+      <div id="clientes" class="page hidden">
+        <header>
+          <h1>Clientes</h1>
+          <button class="primary-btn" onclick="Clientes.showNovoClienteModal()">
+            <i class="fas fa-plus"></i> Novo Cliente
+          </button>
+        </header>
+        <div class="clients-list">
+          <!-- Lista de clientes será preenchida dinamicamente -->
         </div>
       </div>
-    </div>
 
-    <!-- Seção de Detalhes do Cliente -->
-    <div id="clienteDetails" class="section" style="display: none;">
-      <!-- Filled dynamically by JavaScript -->
-    </div>
-
-    <!-- Seção Financeira -->
-    <div id="financeiro" class="section" style="display: none;">
-      <h2>Gestão Financeira</h2>
-      <div class="row">
-        <div class="col-md-12 mb-4">
-          <div class="card">
-            <div class="card-body">
-              <div class="d-flex justify-content-between align-items-center mb-3">
-                <h5 class="card-title">Métricas de Atendimento</h5>
-                <select id="periodoFiltro" class="form-select" style="width: auto;">
-                  <option value="dia">Hoje</option>
-                  <option value="mes">Este Mês</option>
-                  <option value="ano">Este Ano</option>
-                </select>
-              </div>
-              <div class="financial-summary">
-                <div class="summary-item">
-                  <span>Total de Atendimentos</span>
-                  <h3 id="totalAtendimentos">0</h3>
-                </div>
-                <div class="summary-item">
-                  <span>Receita</span>
-                  <h3 id="receitaMensal">R$ 0,00</h3>
-                </div>
-                <div class="summary-item">
-                  <span>Despesas</span>
-                  <h3 id="despesasMensal">R$ 0,00</h3>
-                </div>
-                <div class="summary-item">
-                  <span>Lucro</span>
-                  <h3 id="lucroMensal">R$ 0,00</h3>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="col-md-6 mb-4">
-          <div class="card">
-            <div class="card-body">
-              <h5 class="card-title">Formas de Pagamento</h5>
-              <div class="payment-methods-summary">
-                <div class="summary-item">
-                  <span>Dinheiro</span>
-                  <h3 id="pagamentoDinheiro">R$ 0,00</h3>
-                </div>
-                <div class="summary-item">
-                  <span>Cartão</span>
-                  <h3 id="pagamentoCartao">R$ 0,00</h3>
-                </div>
-                <div class="summary-item">
-                  <span>PIX</span>
-                  <h3 id="pagamentoPix">R$ 0,00</h3>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="col-md-6 mb-4">
-          <div class="card">
-            <div class="card-body">
-              <h5 class="card-title">Saldo nas Plataformas</h5>
-              <div class="platforms-summary">
-                <div class="platform-item">
-                  <h4>Mercado Pago</h4>
-                  <p id="saldoMercadoPago">R$ 0,00</p>
-                </div>
-                <div class="platform-item">
-                  <h4>PagSeguro</h4>
-                  <p id="saldoPagSeguro">R$ 0,00</p>
-                </div>
-                <div class="platform-item">
-                  <h4>PicPay</h4>
-                  <p id="saldoPicPay">R$ 0,00</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="col-md-12">
-          <div class="card">
-            <div class="card-body">
-              <h5 class="card-title">Registros Financeiros</h5>
-              <form id="formFinanceiro" class="mb-3">
-                <div class="row">
-                  <div class="col-md-2">
-                    <input type="date" class="form-control" required>
-                  </div>
-                  <div class="col-md-2">
-                    <select class="form-select" required>
-                      <option value="receita">Receita</option>
-                      <option value="despesa">Despesa</option>
-                    </select>
-                  </div>
-                  <div class="col-md-2">
-                    <input type="number" class="form-control" placeholder="Valor" required>
-                  </div>
-                  <div class="col-md-2">
-                    <select class="form-select" name="formaPagamento">
-                      <option value="">Forma de Pagamento</option>
-                      <option value="dinheiro">Dinheiro</option>
-                      <option value="cartao">Cartão</option>
-                      <option value="pix">PIX</option>
-                    </select>
-                  </div>
-                  <div class="col-md-2">
-                    <select class="form-select" name="plataforma">
-                      <option value="">Plataforma</option>
-                      <option value="mercadopago">Mercado Pago</option>
-                      <option value="pagseguro">PagSeguro</option>
-                      <option value="picpay">PicPay</option>
-                    </select>
-                  </div>
-                  <div class="col-md-2">
-                    <button type="submit" class="btn btn-orange w-100">Registrar</button>
-                  </div>
-                </div>
-                <div class="row mt-2">
-                  <div class="col-md-12">
-                    <input type="text" class="form-control" placeholder="Descrição" required>
-                  </div>
-                </div>
-              </form>
-              <div class="table-responsive">
-                <table class="table">
-                  <thead>
-                    <tr>
-                      <th>Data</th>
-                      <th>Tipo</th>
-                      <th>Descrição</th>
-                      <th>Valor</th>
-                      <th>Forma Pagto</th>
-                      <th>Plataforma</th>
-                    </tr>
-                  </thead>
-                  <tbody id="tabelaFinanceiro">
-                    <!-- Filled by JavaScript -->
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
+      <div id="servicos" class="page hidden">
+        <header>
+          <h1>Serviços</h1>
+          <button class="primary-btn" onclick="Servicos.showNovoServicoModal()">
+            <i class="fas fa-plus"></i> Novo Serviço
+          </button>
+        </header>
+        <div class="services-list">
+          <!-- Lista de serviços será preenchida dinamicamente -->
         </div>
       </div>
-    </div>
+
+      <div id="produtos" class="page hidden">
+        <header>
+          <h1>Produtos</h1>
+          <button class="primary-btn" onclick="Produtos.showNovoProdutoModal()">
+            <i class="fas fa-plus"></i> Novo Produto
+          </button>
+        </header>
+        <div class="products-list">
+          <!-- Lista de produtos será preenchida dinamicamente -->
+        </div>
+      </div>
+
+      <div id="financeiro" class="page hidden">
+        <header>
+          <h1>Financeiro</h1>
+        </header>
+        <div class="financial-dashboard">
+          <!-- Dashboard financeiro será preenchido dinamicamente -->
+        </div>
+      </div>
+
+      <div id="relatorios" class="page hidden">
+        <header>
+          <h1>Relatórios</h1>
+        </header>
+        <div class="reports-dashboard">
+          <!-- Relatórios serão preenchidos dinamicamente -->
+        </div>
+      </div>
+
+      <div id="configuracoes" class="page hidden">
+        <header>
+          <h1>Configurações</h1>
+        </header>
+        <div class="settings-container">
+          <!-- Configurações serão preenchidas dinamicamente -->
+        </div>
+      </div>
+    </main>
   </div>
 
-  <div class="modal fade" id="calendarOverviewModal" tabindex="-1">
-    <div class="modal-dialog modal-lg">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Visão Geral da Agenda</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-        </div>
-        <div class="modal-body calendar-overview-modal">
-          <div id="calendarOverviewContent">
-            <!-- Content will be dynamically populated -->
-          </div>
-        </div>
-      </div>
-    </div>
+  <div id="modal-container" class="hidden">
+    <!-- Modal content will be inserted here dynamically -->
   </div>
 
-  <button class="floating-calendar-button" title="Ver Agenda Completa">
-    <i class="fas fa-calendar-alt"></i>
-  </button>
-
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
-  <script src="app.js"></script>
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      // Function to toggle textarea visibility
-      function setupCheckboxTextarea(checkboxId, textareaId) {
-        const checkbox = document.getElementById(checkboxId);
-        const textarea = document.getElementById(textareaId);
-        
-        if (checkbox && textarea) {
-          checkbox.addEventListener('change', function() {
-            textarea.style.display = this.checked ? 'block' : 'none';
-            if (this.checked) {
-              textarea.required = true;
-            } else {
-              textarea.required = false;
-              textarea.value = '';
-            }
-          });
-        }
-      }
-
-      // Setup all checkbox-textarea pairs
-      setupCheckboxTextarea('gestante', 'gestanteDetalhes');
-      setupCheckboxTextarea('doencasPeleCheck', 'doencasPele');
-      setupCheckboxTextarea('cirurgiaRecenteCheck', 'cirurgiaRecente');
-      setupCheckboxTextarea('problemasCardiacosCheck', 'problemasCardiacos');
-      setupCheckboxTextarea('hipertensaoCheck', 'hipertensaoDetalhes');
-      setupCheckboxTextarea('diabetesCheck', 'diabetesDetalhes');
-      setupCheckboxTextarea('cancerCheck', 'cancer');
-      setupCheckboxTextarea('tratamentoDermatologicoCheck', 'tratamentoDermatologico');
-      setupCheckboxTextarea('alergiasCheck', 'alergias');
-      setupCheckboxTextarea('medicamentosCheck', 'medicamentos');
-    });
-  </script>
+  <!-- Load app scripts -->
+  <script src="js/database.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/agenda.js"></script>
+  <script src="js/clientes.js"></script>
+  <script src="js/produtos.js"></script>
+  <script src="js/servicos.js"></script>
 </body>
 </html>
